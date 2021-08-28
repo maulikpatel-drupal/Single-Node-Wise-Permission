@@ -1,0 +1,16 @@
+{#
+/**
+ * @file
+ * Theme override for tabs.
+ */
+#}
+
+<div class="{{ permission_class }}">
+	{% block content %}
+		{% if content %}
+			<nav class="tabs" role="navigation" class="{{ permission_class }}" aria-label="{{ 'Tabs'|t }}">
+				{{ content }}
+			</nav>
+		{% endif %}
+	{% endblock %}
+</div>

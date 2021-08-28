@@ -1,0 +1,7 @@
+name: TopicXuser 
+core_version_requirement: ^8.8 || ^9
+type: module
+description: Manage Topic Opinion Permission
+package: custom
+dependencies:
+ - drupal:block

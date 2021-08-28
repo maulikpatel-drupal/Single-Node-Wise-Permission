@@ -1,0 +1,3 @@
+services:
+  opinion.checkpermission.service:
+    class: Drupal\opinion\CheckPermission

@@ -1,0 +1,52 @@
+<?php
+
+
+use Drupal\node\NodeInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_entity_presave().
+ */
+function opinion_entity_presave(Drupal\Core\Entity\EntityInterface $entity)
+{
+    $connection = \Drupal::service('database');
+    switch ($entity->bundle()) {
+      // Here you modify only your day content type
+      case 'topic1':
+        // Setting the title with the value of field_date.
+        foreach ($entity->get('field_editor1') as $val) {
+            if (\Drupal::service('opinion.checkpermission.service')->user_permission($val->target_id, $entity->id())) {
+                $user = User::load($val->target_id);
+                $user->addRole('topic_editor');
+                $user->save();
+                $result = $connection->insert('opinion')
+                ->fields([
+                    'nid' => $entity->id(),
+                    'uid' => $val->target_id,
+                    'status' => 1
+                ])
+                ->execute();
+            }
+        }
+       break;
+       case 'opinion1':
+        foreach ($entity->get('field_editor1') as $val) {
+          if (\Drupal::service('opinion.checkpermission.service')->user_permission($val->target_id, $entity->id())) {
+            $user = User::load($val->target_id);
+                $user->addRole('opinion_editor');
+                $user->save();
+                $result = $connection->insert('opinion')
+                ->fields([
+                    'nid' => $entity->id(),
+                    'uid' => $val->target_id,
+                    'status' => 1
+                ])
+                ->execute();
+            }
+        }
+       break;
+    }
+}
+
+

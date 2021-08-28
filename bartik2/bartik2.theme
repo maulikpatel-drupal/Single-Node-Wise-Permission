@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Functions to support theming in the Bartik theme.
+ */
+
+use Drupal\user\Entity\User;
+
+
+/**
+ * Implements hook_preprocess_HOOK() .
+ */
+function bartik2_preprocess_node(&$variables, $hook)
+{
+  
+  // Get current role of user and displayed on the page.
+    global $base_url;
+    $current_user = \Drupal::currentUser();
+    $node = \Drupal::routeMatch()->getParameter('node');
+    $database = \Drupal::database();
+    $user_id = $current_user->id();
+
+    $node_user_id = $node->get('field_editor1')->getValue();
+    $user_array = [1];
+    foreach ($node_user_id as $id) {
+        $user_array[] = $id['target_id'];
+    }
+    
+    if (in_array($user_id, $user_array)) {
+        $variables['role_test'] = 'editor';
+        $variables['show_approve_block'] = 'yes';
+    }
+
+    $path = \Drupal::request()->getHost();
+    $roles = $current_user->getRoles();
+
+        
+    $variables['path'] = $base_url;
+    $variables['user_id'] = $user_id;
+    $variables['node_id'] = $node->id(); 
+  
+    if (\Drupal::service('topicxuser.checkpermission.service')->user_permission($user_id, $node->id())) {
+      $variables['role_test'] = 'editor';
+      $variables['show_approve_block'] = 'yes';
+
+    }
+
+    if ($roles[1] == 'administrator' || $roles[1] == 'categories_admin') {
+      $variables['role_test'] = 'editor';
+      $variables['show_approve_block'] = 'yes';
+    }
+
+    if ($roles[1] != 'administrator' && $roles[1] != 'categories_admin' && $roles[0] == 'authenticated' && \Drupal::service('topicxuser.checkpermission.service')->user_permission($user_id, $node->id()) == 1) {
+     $variables['role_test'] = 'authenticated';
+     $variables['show_approve_block'] = 'no';
+    } 
+    if ($roles[0] == 'anonymous') {
+      $variables['role_test'] = 'anonymous';
+    }
+
+    
+    
+}
+
+/**
+ * Implements hook_preprocess_HOOK() .
+ */
+function bartik2_preprocess_block(&$variables, $hook)
+{
+  
+  // Get current role of user and displayed on the page.
+    global $base_url;
+    $current_user = \Drupal::currentUser();
+    $node = \Drupal::routeMatch()->getParameter('node');
+    $database = \Drupal::database();
+    if ($current_user->isAuthenticated() && isset($node)) {
+        $user_id = $current_user->id();
+
+        if ($variables['elements']['#plugin_id'] == 'local_tasks_block') {
+            $query = $database->select('topicxuser', 'u');
+            $query->condition('u.uid', $user_id, '=');
+            $query->condition('u.nid', $node->id(), '=');
+            $query->fields('u', ['uid','nid']);
+            $result = $query->execute()->fetchObject();
+            $current_user = User::load($user_id);
+            
+            if (isset($result->uid) || $current_user->hasRole('administrator') || $current_user->hasRole('categories_admin')) {
+                $variables['permission_class'] = 'show';
+                $variables['show_approve_block'] = 'yes';
+                $variables['role_test'] = 'editor';
+            } else {
+                $variables['permission_class'] = 'hide';
+                $variables['show_approve_block'] = 'no';
+                $variables['role_test'] = 'editor';
+            }
+        }
+    }
+}

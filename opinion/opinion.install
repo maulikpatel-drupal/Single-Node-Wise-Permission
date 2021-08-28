@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the opinion module.
+ */
+
+/**
+ * Implements hook_schema().
+ *
+ * Defines the database tables used by this module.
+ *
+ * @see hook_schema()
+ *
+ * @ingroup opinion
+ */
+function opinion_schema() {
+  $schema['opinion'] = [
+    'description' => 'Stores Topic related user id .',
+    'fields' => [
+      'pid' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique ID.',
+      ],
+      'nid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "Topic Node Id",
+      ],
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "user's {users}.uid",
+      ],
+      'status' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "Default:0 , Approved: 1, Rejected: 2",
+      ],
+    ],
+    'primary key' => ['pid'],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function opinion_uninstall() {
+  \Drupal::database()->schema()->dropTable('opinion');
+}

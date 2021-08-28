@@ -1,0 +1,31 @@
+opinion.form:
+ path: '/opinion'
+ defaults:
+   _title: 'Opinion form'
+   _form: '\Drupal\opinion\Form\OpinionForm'
+ requirements:
+   _permission: 'access content'
+
+opinion.editor:
+ path: '/editor/{userid}/{nodeid}'
+ defaults:
+   _title: 'Become an Editor'
+   _controller: '\Drupal\opinion\Controller\OpinionController::content'
+ requirements:
+   _permission: 'access content'    
+
+opinion.approve:
+ path: '/approve/{userid}/{nodeid}'
+ defaults:
+   _title: 'Approve  Editor'
+   _controller: '\Drupal\opinion\Controller\OpinionController::approve'
+ requirements:
+   _permission: 'access content' 
+   
+opinion.reject:
+ path: '/reject/{userid}/{nodeid}'
+ defaults:
+   _title: 'Reject  Editor'
+   _controller: '\Drupal\opinion\Controller\OpinionController::reject'
+ requirements:
+   _permission: 'access content' 
